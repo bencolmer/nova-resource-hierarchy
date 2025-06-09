@@ -1,0 +1,50 @@
+{
+    "name": "bencolmer/nova-resource-hierarchy",
+    "description": "A Laravel Nova package that allows you to display and manage resource hierarchy in a tree view.",
+    "keywords": [
+        "laravel",
+        "nova",
+        "resource",
+        "hierarchy",
+        "tree"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ben Colmer",
+            "email": "ben-colmer@outlook.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "laravel/nova": "^5.0"
+    },
+    "require-dev": {
+        "laravel/nova-devtool": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "BenColmer\\NovaResourceHierarchy\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://nova.laravel.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BenColmer\\NovaResourceHierarchy\\ToolServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
