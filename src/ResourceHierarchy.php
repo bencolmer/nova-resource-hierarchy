@@ -3,12 +3,35 @@
 namespace BenColmer\NovaResourceHierarchy;
 
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Resource;
 use Laravel\Nova\Tool;
 
 class ResourceHierarchy extends Tool
 {
+    /**
+     * The resource to be managed.
+     */
+    public Resource $resource;
+
+    /**
+     * The tool icon.
+     */
+    protected string $icon = 'square-3-stack-3d';
+
+    public function __construct(string $resourceClass)
+    {
+        if (! is_subclass_of($resourceClass, Resource::class)) {
+            throw new InvalidArgumentException(
+                'The $resourceClass must be an instance of ' . Resource::class . '.'
+            );
+        }
+
+        $this->resource = $resourceClass::newResource();
+    }
+
     /**
      * Perform any tasks that need to happen when the tool is booted.
      */
@@ -22,8 +45,16 @@ class ResourceHierarchy extends Tool
      */
     public function menu(Request $request): MenuSection
     {
-        return MenuSection::make('Nova Resource Hierarchy')
-            ->path('/nova-resource-hierarchy')
-            ->icon('server');
+        return MenuSection::make($this->title())
+            ->path("/nova-resource-hierarchy/{$this->resource->uriKey()}")
+            ->icon($this->icon);
+    }
+
+    /**
+     * Get the tool's title.
+     */
+    public function title(): string
+    {
+        return $this->resource->singularLabel() . ' Hierarchy';
     }
 }

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Head title="Nova Resource Hierarchy" />
+    <Head :title="title" />
 
-    <Heading class="mb-6">Nova Resource Hierarchy</Heading>
+    <Heading class="mb-6">{{ title }}</Heading>
 
     <Card
       class="flex flex-col items-center justify-center"
@@ -39,6 +39,9 @@
 
 <script>
 export default {
+  props: {
+    title: String,
+  },
   mounted() {
     //
   },

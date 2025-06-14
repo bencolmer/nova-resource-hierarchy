@@ -1,7 +1,7 @@
 <?php
 
+use BenColmer\NovaResourceHierarchy\Http\Controllers\HierarchyController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Nova\Http\Requests\NovaRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +14,4 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 |
 */
 
-Route::get('/', function (NovaRequest $request) {
-    return inertia('ResourceHierarchy');
-});
+Route::get('/{resource}', [HierarchyController::class, 'index']);
