@@ -8,6 +8,10 @@
     "prod": "npm run production",
     "production": "mix --production"
   },
+  "dependencies": {
+    "vue": "^3.5.16",
+    "vue3-nestable": "^3.0.3"
+  },
   "devDependencies": {
     "laravel-nova-devtool": "file:vendor/laravel/nova-devtool"
   }

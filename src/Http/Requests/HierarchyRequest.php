@@ -10,8 +10,10 @@ class HierarchyRequest extends NovaRequest
 {
     /**
      * Get the tool registered to the resource.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function tool(): ?ResourceHierarchy
+    public function tool(): ResourceHierarchy
     {
         $requestResource = $this->resource();
         $tools = Nova::availableTools($this);
@@ -22,6 +24,6 @@ class HierarchyRequest extends NovaRequest
             return $tool;
         }
 
-        return null;
+        abort(404);
     }
 }

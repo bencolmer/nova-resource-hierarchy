@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use BenColmer\NovaResourceHierarchy\Http\Controllers\Api\ResourceIndexController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function (Request $request) {
-//     //
-// });
+Route::get('{resource}', [ResourceIndexController::class, 'index']);

@@ -1,6 +1,6 @@
 <?php
 
-use BenColmer\NovaResourceHierarchy\Http\Controllers\HierarchyController;
+use BenColmer\NovaResourceHierarchy\Http\Controllers\Inertia\HierarchyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/{resource}', [HierarchyController::class, 'index']);
+Route::get('{resource}', [HierarchyController::class, 'index']);

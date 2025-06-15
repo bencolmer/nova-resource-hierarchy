@@ -22,11 +22,17 @@
         "laravel/nova": "^5.0"
     },
     "require-dev": {
-        "laravel/nova-devtool": "^1.7"
+        "laravel/nova-devtool": "^1.7",
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
             "BenColmer\\NovaResourceHierarchy\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BenColmer\\NovaResourceHierarchy\\Tests\\": "tests/"
         }
     },
     "repositories": [

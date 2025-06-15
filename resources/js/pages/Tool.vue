@@ -8,46 +8,161 @@
       class="flex flex-col items-center justify-center"
       style="min-height: 300px"
     >
-      <svg
-        class="animate-spin fill-80 mb-6"
-        width="69"
-        height="72"
-        viewBox="0 0 23 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M20.12 20.455A12.184 12.184 0 0 1 11.5 24a12.18 12.18 0 0 1-9.333-4.319c4.772 3.933 11.88 3.687 16.36-.738a7.571 7.571 0 0 0 0-10.8c-3.018-2.982-7.912-2.982-10.931 0a3.245 3.245 0 0 0 0 4.628 3.342 3.342 0 0 0 4.685 0 1.114 1.114 0 0 1 1.561 0 1.082 1.082 0 0 1 0 1.543 5.57 5.57 0 0 1-7.808 0 5.408 5.408 0 0 1 0-7.714c3.881-3.834 10.174-3.834 14.055 0a9.734 9.734 0 0 1 .03 13.855zM4.472 5.057a7.571 7.571 0 0 0 0 10.8c3.018 2.982 7.912 2.982 10.931 0a3.245 3.245 0 0 0 0-4.628 3.342 3.342 0 0 0-4.685 0 1.114 1.114 0 0 1-1.561 0 1.082 1.082 0 0 1 0-1.543 5.57 5.57 0 0 1 7.808 0 5.408 5.408 0 0 1 0 7.714c-3.881 3.834-10.174 3.834-14.055 0a9.734 9.734 0 0 1-.015-13.87C5.096 1.35 8.138 0 11.5 0c3.75 0 7.105 1.68 9.333 4.319C16.06.386 8.953.632 4.473 5.057z"
-          fill-rule="evenodd"
-        />
-      </svg>
-
-      <h1 class="dark:text-white text-4xl font-light mb-6">
-        We're in a black hole.
-      </h1>
-
-      <p class="dark:text-white text-lg opacity-70">
-        You can edit this tool's component at:
-        <code
-          class="ml-1 border border-gray-100 dark:border-gray-900 text-sm font-mono text-white bg-black rounded px-2 py-1"
-        >
-          /resources/js/pages/Tool.vue
-        </code>
-      </p>
+      <vue-nestable :value="hierarchy" @input="hierarchy = $event">
+        <template v-slot="slot">
+          <vue-nestable-handle>
+            {{ slot.item.id }}
+          </vue-nestable-handle>
+        </template>
+      </vue-nestable>
     </Card>
   </div>
 </template>
 
 <script>
+import { CancelToken, isCancel } from 'axios'
+import { VueNestable, VueNestableHandle } from 'vue3-nestable'
+
 export default {
   props: {
     title: String,
+    resourceUriKey: String,
   },
-  mounted() {
-    //
+
+  components: {
+    VueNestable,
+    VueNestableHandle
+  },
+
+  /**
+   * Mount the component and retrieve its initial data.
+   */
+  async created() {
+    this.getResources();
+
+    // Nova.$on('refresh-resources', this.getResources);
+  },
+
+  data() {
+    return {
+      loading: false,
+      total: 0,
+      hierarchy: [],
+    };
+  },
+
+  methods: {
+    /**
+    * Get the resources based on the tool's resource.
+    */
+    getResources() {
+      if (! this.resourceUriKey) return;
+
+      this.loading = true;
+
+      this.$nextTick(() => {
+        Nova.request().get(`/nova-vendor/nova-resource-hierarchy/${this.resourceUriKey}`, {
+          cancelToken: new CancelToken(canceller => {
+            this.canceller = canceller
+          }),
+        })
+          .then(({ data }) => {
+            this.loading = false;
+
+            this.total = data.total,
+            this.hierarchy = data.hierarchy;
+          })
+          .catch(e => {
+            if (isCancel(e)) return;
+
+            this.loading = false;
+            throw e;
+          })
+      });
+    }
   },
 }
 </script>
 
 <style>
-/* Scoped Styles */
+.nestable {
+  position: relative;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.nestable-rtl {
+  direction: rtl;
+}
+.nestable .nestable-list {
+  margin: 0;
+  padding: 0 0 0 40px;
+  list-style-type: none;
+}
+.nestable-rtl .nestable-list {
+  padding: 0 40px 0 0;
+}
+.nestable > .nestable-list {
+  padding: 0;
+}
+.nestable-item,
+.nestable-item-copy {
+  margin: 10px 0 0;
+}
+.nestable-item:first-child,
+.nestable-item-copy:first-child {
+  margin-top: 0;
+}
+.nestable-item .nestable-list,
+.nestable-item-copy .nestable-list {
+  margin-top: 10px;
+}
+.nestable-item {
+  position: relative;
+}
+.nestable-item.is-dragging .nestable-list {
+  pointer-events: none;
+}
+.nestable-item.is-dragging * {
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+.nestable-item.is-dragging:before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(106, 127, 233, 0.274);
+  border: 1px dashed rgb(73, 100, 241);
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+.nestable-drag-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+.nestable-rtl .nestable-drag-layer {
+  left: auto;
+  right: 0;
+}
+.nestable-drag-layer > .nestable-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  background-color: rgba(106, 127, 233, 0.274);
+}
+.nestable-rtl .nestable-drag-layer > .nestable-list {
+  padding: 0;
+}
+.nestable [draggable="true"] {
+  cursor: move;
+}
+.nestable-handle {
+  display: inline;
+}
 </style>
