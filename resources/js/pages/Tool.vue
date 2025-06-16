@@ -8,7 +8,14 @@
       class="flex flex-col items-center justify-center"
       style="min-height: 300px"
     >
-      <vue-nestable :value="hierarchy" @input="hierarchy = $event">
+      <vue-nestable
+        keyProp="id"
+        :maxDepth="10"
+        :value="hierarchy"
+        :hooks="{ beforeMove: this.beforeMove }"
+        @input="hierarchy = $event"
+        @change="handleChange"
+      >
         <template v-slot="slot">
           <vue-nestable-handle>
             {{ slot.item.id }}
@@ -27,6 +34,7 @@ export default {
   props: {
     title: String,
     resourceUriKey: String,
+    enableOrdering: Boolean ,
   },
 
   components: {
@@ -40,18 +48,73 @@ export default {
   async created() {
     this.getResources();
 
-    // Nova.$on('refresh-resources', this.getResources);
+    if (this.saveCanceller !== null) this.saveCanceller();
+  },
+
+  /**
+   * Unbind the component listeners when the before component is destroyed
+   */
+  beforeUnmount() {
+    if (this.saveCanceller !== null) this.saveCanceller();
   },
 
   data() {
     return {
       loading: false,
+      isSaving: false,
       total: 0,
       hierarchy: [],
+      saveCanceller: null,
     };
   },
 
   methods: {
+    /**
+    * Determine if an item can be reordered.
+    */
+    beforeMove(dragItem, pathFrom, pathTo) {
+      // disable ordering while saving changes
+      if (this.isSaving) return false;
+
+      return this.enableOrdering;
+    },
+
+    /**
+    * Handle change (triggered when a user drops an item).
+    */
+    handleChange(value, options) {
+      if (! options?.items?.length) return;
+
+      this.isSaving = true;
+
+      Nova.request()
+        .patch(
+          `/nova-vendor/nova-resource-hierarchy/${this.resourceUriKey}`,
+          { hierarchy: options.items },
+          {
+            cancelToken: new CancelToken(canceller => {
+              this.saveCanceller = canceller
+            }),
+          }
+        )
+        .then(({ data }) => {
+          this.isSaving = false;
+
+          Nova.success(this.__('Successfully updated hierarchy'));
+        })
+        .catch((e) => {
+          if (isCancel(e)) return;
+
+          this.isSaving = false;
+
+          // display error and refresh hierarchy
+          Nova.error(this.__('Failed to save hierarchy'));
+          this.getResources();
+
+          throw e;
+        });
+    },
+
     /**
     * Get the resources based on the tool's resource.
     */
@@ -61,23 +124,25 @@ export default {
       this.loading = true;
 
       this.$nextTick(() => {
-        Nova.request().get(`/nova-vendor/nova-resource-hierarchy/${this.resourceUriKey}`, {
-          cancelToken: new CancelToken(canceller => {
-            this.canceller = canceller
-          }),
-        })
+        Nova.request()
+          .get(`/nova-vendor/nova-resource-hierarchy/${this.resourceUriKey}`, {
+            cancelToken: new CancelToken(canceller => {
+              this.canceller = canceller
+            }),
+          })
           .then(({ data }) => {
             this.loading = false;
 
             this.total = data.total,
             this.hierarchy = data.hierarchy;
           })
-          .catch(e => {
+          .catch((e) => {
             if (isCancel(e)) return;
 
             this.loading = false;
+            Nova.error(this.__('Failed to fetch hierarchy'));
             throw e;
-          })
+          });
       });
     }
   },
@@ -87,8 +152,7 @@ export default {
 <style>
 .nestable {
   position: relative;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
 }
 .nestable-rtl {
   direction: rtl;

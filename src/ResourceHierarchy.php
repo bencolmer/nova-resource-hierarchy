@@ -17,6 +17,11 @@ class ResourceHierarchy extends Tool
     public Resource $resource;
 
     /**
+     * Enable resource ordering.
+     */
+    public bool $enableOrdering = false;
+
+    /**
      * The tool icon.
      */
     protected string $icon = 'square-3-stack-3d';
@@ -56,5 +61,15 @@ class ResourceHierarchy extends Tool
     public function title(): string
     {
         return $this->resource->singularLabel() . ' Hierarchy';
+    }
+
+    /**
+     * Enable resource ordering.
+     */
+    public function enableOrdering(bool $enableOrdering = true): self
+    {
+        $this->enableOrdering = $enableOrdering;
+
+        return $this;
     }
 }

@@ -10,7 +10,7 @@ use ArrayAccess;
 trait HandlesHierarchy
 {
     /**
-     * Build a hierarchy from a source using depth first tree traversal.
+     * Build a hierarchy from a source.
      */
     private function buildHierarchy(
         array|ArrayAccess $source,
@@ -48,5 +48,40 @@ trait HandlesHierarchy
         }
 
         return $children;
+    }
+
+    /**
+     * Parse a hierarchy to a flat array.
+     */
+    private function parseHierarchy(
+        array $hierarchy,
+        callable $formatItem,
+        string $idField = 'id',
+        mixed $parentId = null,
+        array $result = []
+    ): array {
+        $rank = 0;
+        foreach ($hierarchy as $item) {
+            if (! isset($item[$idField])) continue;
+
+            // parse current item
+            $formatted = $formatItem($item, $parentId, $rank);
+            if ($formatted) $result[] = $formatted;
+
+            // parse children
+            if (isset($item['children']) && is_array($item['children'])) {
+                $result = $this->parseHierarchy(
+                    $item['children'],
+                    $formatItem,
+                    $idField,
+                    $item[$idField],
+                    $result
+                );
+            }
+
+            $rank++;
+        }
+
+        return $result;
     }
 }
