@@ -10,21 +10,18 @@
     @change="handleChange"
   >
     <template v-slot="slot">
-      <vue-nestable-handle>
-        <Icon name="arrows-pointing-out" type="solid" class="nrh-handle-icon" />
-      </vue-nestable-handle>
-
-      <div class="nrh-details">
-        <p>{{ slot.item.id }}</p>
-      </div>
+      <HierarchyListItem
+        :item="slot.item"
+        :resourceUriKey="resourceUriKey"
+        @confirmDelete="confirmDelete"
+      />
     </template>
   </vue-nestable>
 </template>
 
 <script>
 import { CancelToken, isCancel } from 'axios'
-import { Icon } from 'laravel-nova-ui'
-import { VueNestable, VueNestableHandle } from 'vue3-nestable'
+import { VueNestable } from 'vue3-nestable'
 
 export default {
   props: {
@@ -40,9 +37,7 @@ export default {
   },
 
   components: {
-    Icon,
     VueNestable,
-    VueNestableHandle
   },
 
   /**
@@ -51,14 +46,18 @@ export default {
   async created() {
     this.getResources();
 
+    if (this.loadCanceller !== null) this.loadCanceller();
     if (this.saveCanceller !== null) this.saveCanceller();
+    if (this.deleteCanceller !== null) this.deleteCanceller();
   },
 
   /**
    * Unbind the component listeners when the before component is destroyed
    */
   beforeUnmount() {
+    if (this.loadCanceller !== null) this.loadCanceller();
     if (this.saveCanceller !== null) this.saveCanceller();
+    if (this.deleteCanceller !== null) this.deleteCanceller();
   },
 
   data() {
@@ -71,8 +70,10 @@ export default {
       total: 0,
       hierarchy: [],
 
-      // action tokens
+      // cancel tokens
+      loadCanceller: null,
       saveCanceller: null,
+      deleteCanceller: null,
     };
   },
 
@@ -101,7 +102,7 @@ export default {
           { hierarchy: options.items },
           {
             cancelToken: new CancelToken(canceller => {
-              this.saveCanceller = canceller
+              this.saveCanceller = canceller;
             }),
           }
         )
@@ -141,7 +142,7 @@ export default {
         Nova.request()
           .get(`/nova-vendor/nova-resource-hierarchy/${this.resourceUriKey}`, {
             cancelToken: new CancelToken(canceller => {
-              this.canceller = canceller
+              this.loadCanceller = canceller;
             }),
           })
           .then(({ data }) => {
@@ -158,7 +159,51 @@ export default {
             throw e;
           });
       });
-    }
+    },
+
+    /**
+    * Confirm a delete action.
+    */
+    confirmDelete(item) {
+      if (confirm('Are you sure you want to delete this resource?')) {
+        this.deleteResource(item);
+      }
+    },
+
+    /**
+    * Delete a resource.
+    */
+    deleteResource(item) {
+      if (! item?.id) return;
+
+      this.isSaving = true;
+
+      Nova.request()
+        .delete(
+          `/nova-api/${this.resourceUriKey}?resources[]=${item.id}`,
+          {
+            cancelToken: new CancelToken(canceller => {
+              this.deleteCanceller = canceller;
+            }),
+          }
+        )
+        .then(({ data }) => {
+          this.isSaving = false;
+
+          // refetch resources after delete
+          this.getResources();
+          Nova.success('Successfully deleted the item');
+        })
+        .catch((e) => {
+          if (isCancel(e)) return;
+
+          this.isSaving = false;
+
+          this.getResources();
+          Nova.error(this.__('Failed to delete the item'));
+          throw e;
+        });
+    },
   },
 }
 </script>
@@ -254,7 +299,7 @@ export default {
 
     .nrh-details {
       display: flex;
-      justify-content: stretch;
+      justify-content: space-between;
       align-items: center;
       width: 100%;
       min-width: fit-content;
@@ -264,6 +309,26 @@ export default {
       border-style: solid;
       border-width: 1px;
       border-radius: 0 0.375rem 0.375rem 0;
+
+      .nrh-detail-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+
+        .nrh-detail-action-btn {
+          color: rgba(var(--colors-gray-500));
+
+          .nrh-icon {
+            height: 1.375rem;
+            width: 1.375rem;
+          }
+
+          &:hover {
+            color: rgba(var(--colors-primary-500));
+          }
+        }
+      }
     }
 
     .nestable-handle {
@@ -281,11 +346,11 @@ export default {
       background-color: rgba(var(--colors-gray-100));
       opacity: 0.65;
       transition: opacity 0.1s;
-    }
 
-    .nrh-handle-icon {
-      height: 1rem;
-      width: 1rem;
+      .nrh-icon {
+        height: 1.25rem;
+        width: 1.25rem;
+      }
     }
 
     &:hover .nestable-handle {
