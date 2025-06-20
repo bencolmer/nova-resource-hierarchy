@@ -13,6 +13,8 @@
     "vue3-nestable": "^3.0.3"
   },
   "devDependencies": {
-    "laravel-nova-devtool": "file:vendor/laravel/nova-devtool"
+    "laravel-nova-devtool": "file:vendor/laravel/nova-devtool",
+    "sass": "^1.89.2",
+    "sass-loader": "^16.0.5"
   }
 }
