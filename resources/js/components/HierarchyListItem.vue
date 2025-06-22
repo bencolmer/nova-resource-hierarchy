@@ -1,10 +1,10 @@
 <template>
-  <vue-nestable-handle
+  <VueNestableHandle
     title="Move"
     aria-label="Move"
   >
     <Icon name="arrows-pointing-out" type="solid" class="nrh-icon" />
-  </vue-nestable-handle>
+  </VueNestableHandle>
 
   <div class="nrh-details">
     <p>{{ item.id }}</p>
@@ -14,7 +14,7 @@
         title="View"
         aria-label="View"
         :href="viewUrl"
-        class="nrh-detail-action-btn"
+        class="nrh-detail-action"
       >
         <Icon name="eye" type="outline" class="nrh-icon" />
       </Link>
@@ -23,7 +23,7 @@
         title="Edit"
         aria-label="Edit"
         :href="updateUrl"
-        class="nrh-detail-action-btn"
+        class="nrh-detail-action"
       >
         <Icon name="pencil-alt" type="outline" class="nrh-icon" />
       </Link>
@@ -33,7 +33,7 @@
         aria-label="Delete"
         type="button"
         @click.prevent="$emit('confirmDelete', item)"
-        class="nrh-detail-action-btn"
+        class="nrh-detail-action"
       >
         <Icon name="trash" type="outline" class="nrh-icon" />
       </button>

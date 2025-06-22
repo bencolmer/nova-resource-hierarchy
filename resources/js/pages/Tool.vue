@@ -11,7 +11,7 @@
 
       <Link
         :href="createUrl"
-        class="nrh-create-btn"
+        class="nrh-btn-primary"
       >
         Create
       </Link>
@@ -62,52 +62,15 @@ export default {
   align-items: start;
   gap: 1rem;
   margin-top: 0.75rem;
+
+  .nrh-btn-primary {
+    margin-top: auto;
+    margin-left: auto;
+  }
 }
 
 .nrh-intro-copy {
   line-height: 1.25;
-}
-
-.nrh-create-btn {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  height: 2.25rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-top: auto;
-  margin-left: auto;
-  font-weight: bold;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: white;
-  background-color: rgba(var(--colors-primary-500));
-  --btn-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);
-  box-shadow: 0 0 #000000,0 0 #000000, var(--btn-shadow);
-
-  &:is(.dark *) {
-    color: rgba(var(--colors-gray-800));
-
-    &:focus {
-      box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-gray-600)), var(--btn-shadow);
-    }
-  }
-
-  &:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-
-    box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-primary-200)), var(--btn-shadow);
-  }
-
-  &:hover {
-    background-color: rgba(var(--colors-primary-400));
-  }
-
-  &:active {
-    background-color: rgba(var(--colors-primary-600));
-  }
 }
 
 .nrh-hierarchy-list-card {

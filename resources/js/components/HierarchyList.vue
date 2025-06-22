@@ -1,22 +1,45 @@
 <template>
-  <vue-nestable
-    keyProp="id"
-    :maxDepth="10"
-    :value="hierarchy"
-    :hooks="{ beforeMove: this.beforeMove }"
-    class="nrh-nestable"
-    :rtl="false"
-    @input="hierarchy = $event"
-    @change="handleChange"
-  >
-    <template v-slot="slot">
-      <HierarchyListItem
-        :item="slot.item"
-        :resourceUriKey="resourceUriKey"
-        @confirmDelete="confirmDelete"
-      />
-    </template>
-  </vue-nestable>
+  <LoadingView :loading="isLoading">
+    <!-- No results found -->
+    <div
+      v-if="!hierarchy?.length"
+      class="nrh-no-results"
+    >
+      <Heading :level="2">
+        No resources found
+      </Heading>
+
+      <p>We couldn't find any resources to display.</p>
+
+      <Link
+        :href="createUrl"
+        class="nrh-btn-primary"
+      >
+        Create
+      </Link>
+    </div>
+
+    <!-- Result list -->
+    <VueNestable
+      v-if="hierarchy?.length > 0"
+      keyProp="id"
+      :maxDepth="10"
+      :value="hierarchy"
+      :hooks="{ beforeMove: this.beforeMove }"
+      class="nrh-nestable"
+      :rtl="false"
+      @input="hierarchy = $event"
+      @change="handleChange"
+    >
+      <template v-slot="slot">
+        <HierarchyListItem
+          :item="slot.item"
+          :resourceUriKey="resourceUriKey"
+          @confirmDelete="confirmDelete"
+        />
+      </template>
+    </VueNestable>
+  </LoadingView>
 </template>
 
 <script>
@@ -209,6 +232,22 @@ export default {
 </script>
 
 <style lang="scss">
+.nrh-no-results {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  min-height: 12rem;
+  margin: auto;
+
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
 .nrh-nestable {
   &.nestable {
     position: relative;
@@ -335,7 +374,7 @@ export default {
         align-items: center;
         gap: 0.5rem;
 
-        .nrh-detail-action-btn {
+        .nrh-detail-action {
           color: rgba(var(--colors-gray-500));
 
           &:is(.dark *) {
