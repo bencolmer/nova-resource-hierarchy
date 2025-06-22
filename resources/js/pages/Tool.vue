@@ -86,6 +86,14 @@ export default {
   --btn-shadow: 0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px -1px rgba(0,0,0,0.1);
   box-shadow: 0 0 #000000,0 0 #000000, var(--btn-shadow);
 
+  &:is(.dark *) {
+    color: rgba(var(--colors-gray-800));
+
+    &:focus {
+      box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-gray-600)), var(--btn-shadow);
+    }
+  }
+
   &:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
@@ -99,14 +107,6 @@ export default {
 
   &:active {
     background-color: rgba(var(--colors-primary-600));
-  }
-
-  &:is(.dark *) {
-    color: rgba(var(--colors-gray-800));
-
-    &:focus {
-      box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-gray-600)), var(--btn-shadow);
-    }
   }
 }
 
