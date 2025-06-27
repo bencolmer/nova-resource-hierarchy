@@ -12,6 +12,7 @@
       <p>We couldn't find any resources to display.</p>
 
       <Link
+        v-if="enableCreateAction && createUrl"
         :href="createUrl"
         class="nrh-btn-primary"
       >
@@ -22,12 +23,12 @@
     <!-- Result list -->
     <VueNestable
       v-if="hierarchy?.length > 0"
-      keyProp="id"
-      :maxDepth="10"
+      :keyProp="modelKey"
+      :maxDepth="maxDepth"
       :value="hierarchy"
       :hooks="{ beforeMove: this.beforeMove }"
       class="nrh-nestable"
-      :rtl="false"
+      :rtl="enableRtl"
       @input="hierarchy = $event"
       @change="handleChange"
     >
@@ -36,6 +37,10 @@
           :item="slot.item"
           :resourceUriKey="resourceUriKey"
           :isDisabled="isLoading || isSaving"
+          :enableReordering="enableReordering"
+          :enableViewAction="enableViewAction"
+          :enableUpdateAction="enableUpdateAction"
+          :enableDeleteAction="enableDeleteAction"
           @confirmDelete="confirmDelete"
         />
       </template>
@@ -53,10 +58,47 @@ export default {
       type: String,
       required: true
     },
-    enableOrdering: {
+    modelKey: {
+      type: String,
+      required: true
+    },
+    maxDepth: {
+      type: Number,
+      required: true
+    },
+    createUrl: {
+      type: String,
+      required: false
+    },
+    enableReordering: {
       type: Boolean,
       required: false,
       default: true
+    },
+    enableRtl: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableCreateAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableViewAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableUpdateAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableDeleteAction: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
 
@@ -109,7 +151,7 @@ export default {
       // disable ordering while saving changes or loading
       if (this.isLoading || this.isSaving) return false;
 
-      return this.enableOrdering;
+      return this.enableReordering;
     },
 
     /**
@@ -173,7 +215,7 @@ export default {
           .then(({ data }) => {
             this.isLoading = false;
 
-            this.total = data.total,
+            this.total = data.total;
             this.hierarchy = data.hierarchy;
           })
           .catch((e) => {
@@ -242,6 +284,7 @@ export default {
   text-align: center;
   gap: 0.5rem;
   min-height: 12rem;
+  padding: 1rem;
   margin: auto;
 
   h2 {
@@ -255,6 +298,7 @@ export default {
     position: relative;
     width: fit-content;
     min-width: 100%;
+    padding: 1rem;
 
     .nestable-list {
       margin: 0;
@@ -358,13 +402,13 @@ export default {
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      min-width: fit-content;
       gap: 0.5rem;
       padding: 0.75rem;
       border-color: rgba(var(--colors-gray-200));
       border-style: solid;
       border-width: 1px;
-      border-radius: 0 0.375rem 0.375rem 0;
+      border-radius: 0.375rem;
+      font-weight: 600;
 
       &:is(.dark *) {
         border-color: rgba(var(--colors-gray-700));
@@ -386,7 +430,7 @@ export default {
         }
 
         .nrh-detail-action {
-          padding: 0.2rem;
+          padding: 0.125rem;
           border-radius: 0.25rem;
           color: rgba(var(--colors-gray-500));
 
@@ -409,8 +453,8 @@ export default {
           }
 
           .nrh-icon {
-            height: 1.375rem;
-            width: 1.375rem;
+            height: 1.5rem;
+            width: 1.5rem;
           }
         }
       }
@@ -432,6 +476,10 @@ export default {
       opacity: 0.65;
       transition: opacity 0.1s;
 
+      & + .nrh-details {
+        border-radius: 0 0.375rem 0.375rem 0;
+      }
+
       &.nrh-disabled {
         pointer-events: none;
         opacity: 0.4;
@@ -451,8 +499,8 @@ export default {
       }
 
       .nrh-icon {
-        height: 1.25rem;
-        width: 1.25rem;
+        height: 1.375rem;
+        width: 1.375rem;
         color: rgba(var(--colors-gray-600));
       }
     }
@@ -488,6 +536,12 @@ export default {
         border-radius: 0 0.375rem 0.375rem 0;
       }
     }
+  }
+}
+
+@media (width >= 48rem) {
+  .nrh-no-results, .nrh-nestable.nestable {
+    padding: 1.5rem;
   }
 }
 </style>

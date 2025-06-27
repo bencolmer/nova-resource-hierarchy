@@ -1,15 +1,16 @@
 <template>
   <div class="nrh-tool">
-    <Head :title="title" />
+    <Head :title="pageTitle" />
 
-    <Heading>{{ title }}</Heading>
+    <Heading>{{ pageTitle }}</Heading>
 
-    <div class="nrh-hierarchy-header">
-      <p class="nrh-intro-copy">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Fugiat iste esse dolor provident cupiditate, repellendus illum laudantium!
+    <div class="nrh-hierarchy-header" v-if="pageDescription || enableCreateAction">
+      <p class="nrh-intro-copy" v-if="pageDescription">
+        {{ pageDescription }}
       </p>
 
       <Link
+        v-if="enableCreateAction"
         :href="createUrl"
         class="nrh-btn-primary"
       >
@@ -20,7 +21,15 @@
     <Card class="nrh-hierarchy-list-card">
       <HierarchyList
         :resourceUriKey="resourceUriKey"
-        :enableOrdering="enableOrdering"
+        :modelKey="modelKey"
+        :maxDepth="maxDepth"
+        :createUrl="createUrl"
+        :enableReordering="enableReordering"
+        :enableRtl="enableRtl"
+        :enableCreateAction="enableCreateAction"
+        :enableViewAction="enableViewAction"
+        :enableUpdateAction="enableUpdateAction"
+        :enableDeleteAction="enableDeleteAction"
       />
     </Card>
   </div>
@@ -33,15 +42,52 @@ export default {
       type: String,
       required: true
     },
-    title: {
+    modelKey: {
+      type: String,
+      required: true
+    },
+    maxDepth: {
+      type: Number,
+      required: true
+    },
+    pageTitle: {
       type: String,
       required: false
     },
-    enableOrdering: {
+    pageDescription: {
+      type: String,
+      required: false
+    },
+    enableReordering: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: false
+    },
+    enableRtl: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableCreateAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableViewAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableUpdateAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableDeleteAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
 
   computed: {
@@ -74,7 +120,6 @@ export default {
 }
 
 .nrh-hierarchy-list-card {
-  padding: 1rem;
   margin-top: 1.5rem;
   width: 100%;
   overflow-x: auto;
@@ -84,10 +129,13 @@ export default {
   .nrh-hierarchy-header {
     flex-direction: row;
     gap: 4rem;
-  }
 
-  .nrh-hierarchy-list-card {
-    padding: 1.5rem;
+    &:is([dir=rtl] *) {
+      .nrh-btn-primary {
+        margin-left: 0;
+        margin-right: auto;
+      }
+    }
   }
 }
 </style>

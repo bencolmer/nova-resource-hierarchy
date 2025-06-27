@@ -1,5 +1,6 @@
 <template>
   <VueNestableHandle
+    v-if="enableReordering"
     title="Move"
     aria-label="Move"
     :class="isDisabled ? 'nrh-disabled' : ''"
@@ -10,8 +11,12 @@
   <div class="nrh-details">
     <p>{{ item.id }}</p>
 
-    <div :class="`nrh-detail-actions ${isDisabled ? 'nrh-disabled' : ''}`">
+    <div
+      v-if="enableViewAction || enableUpdateAction || enableDeleteAction"
+      :class="`nrh-detail-actions ${isDisabled ? 'nrh-disabled' : ''}`"
+    >
       <Link
+        v-if="enableViewAction"
         title="View"
         aria-label="View"
         :href="viewUrl"
@@ -22,6 +27,7 @@
       </Link>
 
       <Link
+        v-if="enableUpdateAction"
         title="Edit"
         aria-label="Edit"
         :href="updateUrl"
@@ -32,6 +38,7 @@
       </Link>
 
       <button
+        v-if="enableDeleteAction"
         title="Delete"
         aria-label="Delete"
         type="button"
@@ -63,6 +70,26 @@ export default {
       type: Boolean,
       default: false,
       required: false,
+    },
+    enableReordering: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableViewAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableUpdateAction: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    enableDeleteAction: {
+      type: Boolean,
+      required: false,
+      default: false
     },
   },
 

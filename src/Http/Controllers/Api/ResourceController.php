@@ -8,6 +8,7 @@ use BenColmer\NovaResourceHierarchy\Traits\HandlesHierarchy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Arr;
 
 class ResourceController extends Controller
 {
@@ -65,7 +66,7 @@ class ResourceController extends Controller
 
         // get models in the hierarchy
         $models = $request->newQuery()
-            ->whereIn($idField, collect($parsed)->pluck($idField))
+            ->whereIn($idField, Arr::pluck($parsed, $idField))
             ->get();
 
         // update all parents and orders, ensuring we trigger model events

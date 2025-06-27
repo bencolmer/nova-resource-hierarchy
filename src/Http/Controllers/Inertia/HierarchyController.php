@@ -14,10 +14,6 @@ class HierarchyController extends Controller
     {
         $tool = $request->tool();
 
-        return inertia('ResourceHierarchy', [
-            'title' => $tool->title(),
-            'resourceUriKey' => $tool->resource->uriKey(),
-            'enableOrdering' => $tool->enableOrdering,
-        ]);
+        return inertia('ResourceHierarchy', $tool->getConfig());
     }
 }

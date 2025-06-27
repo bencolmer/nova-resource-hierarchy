@@ -9,6 +9,9 @@ use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Tool;
 
+/**
+ * @method static static make(string $resourceClass)
+ */
 class ResourceHierarchy extends Tool
 {
     /**
@@ -17,14 +20,49 @@ class ResourceHierarchy extends Tool
     public Resource $resource;
 
     /**
-     * Enable resource ordering.
+     * Hide the tool navigation menu entry.
      */
-    public bool $enableOrdering = false;
+    protected bool $hideMenu = false;
 
     /**
-     * The tool icon.
+     * The tool menu title.
      */
-    protected string $icon = 'square-3-stack-3d';
+    protected ?string $menuTitle = null;
+
+    /**
+     * The tool menu icon.
+     */
+    protected string $menuIcon = 'square-3-stack-3d';
+
+    /**
+     * The tool page title.
+     */
+    protected ?string $pageTitle = null;
+
+    /**
+     * The tool page description.
+     */
+    protected ?string $pageDescription = null;
+
+    /**
+     * The maximum hierarchy depth.
+     */
+    protected int $maxDepth = 10;
+
+    /**
+     * Enable resource reordering.
+     */
+    protected bool $enableReordering = false;
+
+    /**
+     * The available resource actions on the tool page.
+     */
+    protected array $actions = [
+        'create',
+        'view',
+        'update',
+        'delete',
+    ];
 
     public function __construct(string $resourceClass)
     {
@@ -48,27 +86,138 @@ class ResourceHierarchy extends Tool
     /**
      * Build the menu that renders the navigation links for the tool.
      */
-    public function menu(Request $request): MenuSection
+    public function menu(Request $request): ?MenuSection
     {
-        return MenuSection::make($this->title())
+        if ($this->hideMenu) return null;
+
+        return MenuSection::make($this->getMenuTitle())
             ->path("/nova-resource-hierarchy/{$this->resource->uriKey()}")
-            ->icon($this->icon);
+            ->icon($this->menuIcon);
     }
 
     /**
-     * Get the tool's title.
+     * Get the tool menu title.
      */
-    public function title(): string
+    protected function getMenuTitle(): string
     {
+        // use a custom title if configured
+        if (isset($this->menuTitle)) return $this->menuTitle;
+
+        return $this->getPageTitle();
+    }
+
+    /**
+     * Get the tool page title.
+     */
+    protected function getPageTitle(): string
+    {
+        // use a custom title if configured
+        if (isset($this->pageTitle)) return $this->pageTitle;
+
         return $this->resource->singularLabel() . ' Hierarchy';
     }
 
     /**
-     * Enable resource ordering.
+     * Get the available tool configuration.
      */
-    public function enableOrdering(bool $enableOrdering = true): self
+    public function getConfig()
     {
-        $this->enableOrdering = $enableOrdering;
+        return [
+            'pageTitle' => $this->getPageTitle(),
+            'pageDescription' => $this->pageDescription,
+            'resourceUriKey' => $this->resource->uriKey(),
+            'modelKey' => $this->resource->model()->getKeyName(),
+            'maxDepth' => $this->maxDepth,
+            'enableRtl' => Nova::rtlEnabled(),
+            'enableReordering' => $this->enableReordering,
+            'enableCreateAction' => in_array('create', $this->actions),
+            'enableViewAction' => in_array('view', $this->actions),
+            'enableUpdateAction' => in_array('update', $this->actions),
+            'enableDeleteAction' => in_array('delete', $this->actions),
+        ];
+    }
+
+    /**
+     * Hide the tool navigation menu entry.
+     */
+    public function hideMenu(bool $hideMenu = true): self
+    {
+        $this->hideMenu = $hideMenu;
+
+        return $this;
+    }
+
+    /**
+     * Set the tool menu title.
+     */
+    public function menuTitle(string $menuTitle): self
+    {
+        $this->menuTitle = $menuTitle;
+
+        return $this;
+    }
+
+    /**
+     * Set the tool menu icon.
+     */
+    public function menuIcon(string $menuIcon): self
+    {
+        $this->menuIcon = $menuIcon;
+
+        return $this;
+    }
+
+    /**
+     * Set the tool page title.
+     */
+    public function pageTitle(string $pageTitle): self
+    {
+        $this->pageTitle = $pageTitle;
+
+        return $this;
+    }
+
+    /**
+     * Set the tool page description.
+     */
+    public function pageDescription(string $pageDescription): self
+    {
+        $this->pageDescription = $pageDescription;
+
+        return $this;
+    }
+
+    /**
+     * Set the maximum hierarchy depth.
+     */
+    public function maxDepth(int $maxDepth): self
+    {
+        $this->maxDepth = $maxDepth > 0 ? $maxDepth : 0;
+
+        return $this;
+    }
+
+    /**
+     * Enable resource reordering.
+     */
+    public function enableReordering(bool $enableReordering = true): self
+    {
+        $this->enableReordering = $enableReordering;
+
+        return $this;
+    }
+
+    /**
+     * Set the available actions on the tool page.
+     *
+     * @param array<string> $actions
+     */
+    public function actions(array $actions): self
+    {
+        $this->actions = array_map(
+            fn($action) => strtolower((string) $action),
+            $actions
+        );
 
         return $this;
     }
