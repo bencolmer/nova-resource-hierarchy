@@ -35,6 +35,7 @@
         <HierarchyListItem
           :item="slot.item"
           :resourceUriKey="resourceUriKey"
+          :isDisabled="isLoading || isSaving"
           @confirmDelete="confirmDelete"
         />
       </template>
@@ -115,6 +116,7 @@ export default {
     * Handle change (triggered when a user drops an item).
     */
     handleChange(value, options) {
+      if (this.isSaving) return;
       if (! options?.items?.length) return;
 
       this.isSaving = true;
@@ -374,8 +376,17 @@ export default {
         align-items: center;
         gap: 0.125rem;
 
+        &.nrh-disabled {
+          cursor: not-allowed;
+
+          .nrh-detail-action {
+            pointer-events: none;
+            opacity: 0.5;
+          }
+        }
+
         .nrh-detail-action {
-          padding: 0.25rem;
+          padding: 0.2rem;
           border-radius: 0.25rem;
           color: rgba(var(--colors-gray-500));
 
@@ -420,6 +431,11 @@ export default {
       background-color: rgba(var(--colors-gray-100));
       opacity: 0.65;
       transition: opacity 0.1s;
+
+      &.nrh-disabled {
+        pointer-events: none;
+        opacity: 0.4;
+      }
 
       &:is(.dark *) {
         border-color: rgba(var(--colors-gray-700));

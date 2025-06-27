@@ -2,6 +2,7 @@
   <VueNestableHandle
     title="Move"
     aria-label="Move"
+    :class="isDisabled ? 'nrh-disabled' : ''"
   >
     <Icon name="arrows-pointing-out" type="solid" class="nrh-icon" />
   </VueNestableHandle>
@@ -9,12 +10,13 @@
   <div class="nrh-details">
     <p>{{ item.id }}</p>
 
-    <div class="nrh-detail-actions">
+    <div :class="`nrh-detail-actions ${isDisabled ? 'nrh-disabled' : ''}`">
       <Link
         title="View"
         aria-label="View"
         :href="viewUrl"
         class="nrh-detail-action"
+        :tabIndex="isDisabled ? '-1' : ''"
       >
         <Icon name="eye" type="outline" class="nrh-icon" />
       </Link>
@@ -24,6 +26,7 @@
         aria-label="Edit"
         :href="updateUrl"
         class="nrh-detail-action"
+        :tabIndex="isDisabled ? '-1' : ''"
       >
         <Icon name="pencil-alt" type="outline" class="nrh-icon" />
       </Link>
@@ -34,6 +37,7 @@
         type="button"
         @click.prevent="$emit('confirmDelete', item)"
         class="nrh-detail-action"
+        :tabIndex="isDisabled ? '-1' : ''"
       >
         <Icon name="trash" type="outline" class="nrh-icon" />
       </button>
@@ -54,7 +58,12 @@ export default {
     item: {
       type: Object,
       required: true,
-    }
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
 
   emits: ['confirmDelete'],
