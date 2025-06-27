@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="nrh-tool">
     <Head :title="title" />
 
     <Heading>{{ title }}</Heading>

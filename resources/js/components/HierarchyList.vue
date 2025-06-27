@@ -372,13 +372,25 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.125rem;
 
         .nrh-detail-action {
+          padding: 0.25rem;
+          border-radius: 0.25rem;
           color: rgba(var(--colors-gray-500));
 
           &:is(.dark *) {
             color: rgba(var(--colors-gray-400));
+
+            &:focus {
+              box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-gray-600)), var(--nrh-btn-shadow);
+            }
+          }
+
+          &:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 0px #ffffff, 0 0 0 3px rgba(var(--colors-primary-200)), var(--nrh-btn-shadow);
           }
 
           &:hover {
