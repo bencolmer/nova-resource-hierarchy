@@ -23,7 +23,7 @@
     <!-- Result list -->
     <VueNestable
       v-if="hierarchy?.length > 0"
-      :keyProp="modelKey"
+      :keyProp="idKey"
       :maxDepth="maxDepth"
       :value="hierarchy"
       :hooks="{ beforeMove: this.beforeMove }"
@@ -35,6 +35,7 @@
       <template v-slot="slot">
         <HierarchyListItem
           :item="slot.item"
+          :idKey="idKey"
           :resourceUriKey="resourceUriKey"
           :isDisabled="isLoading || isSaving"
           :enableReordering="enableReordering"
@@ -58,7 +59,7 @@ export default {
       type: String,
       required: true
     },
-    modelKey: {
+    idKey: {
       type: String,
       required: true
     },
@@ -241,13 +242,13 @@ export default {
     * Delete a resource.
     */
     deleteResource(item) {
-      if (! item?.id) return;
+      if (! item?.[this.idKey]) return;
 
       this.isSaving = true;
 
       Nova.request()
         .delete(
-          `/nova-api/${this.resourceUriKey}?resources[]=${item.id}`,
+          `/nova-api/${this.resourceUriKey}?resources[]=${item[this.idKey]}`,
           {
             cancelToken: new CancelToken(canceller => {
               this.deleteCanceller = canceller;

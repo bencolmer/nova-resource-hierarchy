@@ -9,8 +9,14 @@ class UpdateHierarchyRequest extends HierarchyRequest
      */
     public function authorize(): bool
     {
-        // disallow hierarchy changes if not enabled
         $config = $this->tool()->getConfig();
+
+        // disallow hierarchy changes if we haven't set the order key
+        if (! (isset($config['orderKey']) && $config['orderKey'])) {
+            return false;
+        }
+
+        // disallow hierarchy changes if not enabled
         $enableReordering = (bool) ($config['enableReordering'] ?? false);
         if (! $enableReordering) return false;
 

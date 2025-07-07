@@ -9,7 +9,7 @@
   </VueNestableHandle>
 
   <div class="nrh-details">
-    <p>{{ item.id }}</p>
+    <p>{{ item.title }}</p>
 
     <div
       v-if="enableViewAction || enableUpdateAction || enableDeleteAction"
@@ -62,6 +62,10 @@ export default {
       type: String,
       required: true
     },
+    idKey: {
+      type: String,
+      required: true
+    },
     item: {
       type: Object,
       required: true,
@@ -103,13 +107,13 @@ export default {
   computed: {
     viewUrl() {
       return this.$url(
-        `/resources/${this.resourceUriKey}/${this.item?.id}`
+        `/resources/${this.resourceUriKey}/${this.item?.[this.idKey]}`
       );
     },
 
     updateUrl() {
       return this.$url(
-        `/resources/${this.resourceUriKey}/${this.item?.id}/edit`
+        `/resources/${this.resourceUriKey}/${this.item?.[this.idKey]}/edit`
       );
     },
   },

@@ -16,14 +16,15 @@ class HandlesHierarchyTest extends TestCase
     public function test_build_hierarchy(
         array|ArrayAccess $input,
         array $expected,
-        string $idField = 'id',
-        string $parentIdField = 'parent_id'
+        string $idKey = 'id',
+        string $parentKey = 'parent_id'
     ): void {
         $result = $this->buildHierarchy(
             $input,
             fn($item) => $item instanceof Model ? $item->toArray() : $item,
-            $idField,
-            $parentIdField
+            null,
+            $idKey,
+            $parentKey
         );
 
         $this->assertEqualsCanonicalizing($expected, $result);
@@ -34,18 +35,18 @@ class HandlesHierarchyTest extends TestCase
         array|ArrayAccess $input,
         array $expected,
         mixed $defaultParentValue = null,
-        string $idField = 'id',
-        string $parentIdField = 'parent_id',
-        string $orderField = 'rank'
+        string $idKey = 'id',
+        string $parentKey = 'parent_id',
+        string $orderKey = 'rank'
     ): void {
         $result = $this->parseHierarchy(
             $input,
             fn($item, $parentId, $rank) => [
-                $idField => $item[$idField],
-                $parentIdField => $parentId,
-                $orderField => $rank,
+                $idKey => $item[$idKey],
+                $parentKey => $parentId,
+                $orderKey => $rank,
             ],
-            $idField,
+            $idKey,
             $defaultParentValue
         );
 
@@ -217,8 +218,8 @@ class HandlesHierarchyTest extends TestCase
                         'children' => [],
                     ],
                 ],
-                'idField' => 'key',
-                'parentIdField' => 'relatedID',
+                'idKey' => 'key',
+                'parentKey' => 'relatedID',
             ],
             'collection of models' => [
                 'input' => collect([
@@ -544,9 +545,9 @@ class HandlesHierarchyTest extends TestCase
                     ['key' => 9, 'relatedID' => 0, 'orderNum' => 5],
                 ],
                 'defaultParentValue' => 0,
-                'idField' => 'key',
-                'parentIdField' => 'relatedID',
-                'orderField' => 'orderNum',
+                'idKey' => 'key',
+                'parentKey' => 'relatedID',
+                'orderKey' => 'orderNum',
             ],
         ];
     }

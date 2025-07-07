@@ -15,16 +15,17 @@ trait HandlesHierarchy
     private function buildHierarchy(
         array|ArrayAccess $source,
         callable $formatItem,
-        string $idField = 'id',
-        string $parentField = 'parent_id',
+        ?callable $orderItems = null,
+        string $idKey = 'id',
+        string $parentKey = 'parent_id',
         mixed $parentId = null
     ): array {
         $children = [];
         foreach ($source as $key => $item) {
-            if (! isset($item[$idField])) continue;
+            if (! isset($item[$idKey])) continue;
 
             // represent any falsy parent ID as a top-level node
-            $itemParentId = $item[$parentField] ?? null;
+            $itemParentId = $item[$parentKey] ?? null;
             if (! $itemParentId) $itemParentId = null;
 
             // only parse direct children
@@ -40,12 +41,15 @@ trait HandlesHierarchy
             $formatted['children'] = $this->buildHierarchy(
                 $source,
                 $formatItem,
-                $idField,
-                $parentField,
-                $item[$idField]
+                $orderItems,
+                $idKey,
+                $parentKey,
+                $item[$idKey]
             );
             $children[] = $formatted;
         }
+
+        if ($orderItems) $children = $orderItems($children);
 
         return $children;
     }
@@ -56,13 +60,13 @@ trait HandlesHierarchy
     private function parseHierarchy(
         array $hierarchy,
         callable $formatItem,
-        string $idField = 'id',
+        string $idKey = 'id',
         mixed $parentId = null,
         array $result = []
     ): array {
         $rank = 0;
         foreach ($hierarchy as $item) {
-            if (! isset($item[$idField])) continue;
+            if (! isset($item[$idKey])) continue;
 
             // parse current item
             $formatted = $formatItem($item, $parentId, $rank);
@@ -73,8 +77,8 @@ trait HandlesHierarchy
                 $result = $this->parseHierarchy(
                     $item['children'],
                     $formatItem,
-                    $idField,
-                    $item[$idField],
+                    $idKey,
+                    $item[$idKey],
                     $result
                 );
             }

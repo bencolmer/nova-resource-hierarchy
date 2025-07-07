@@ -20,6 +20,28 @@ class ResourceHierarchy extends Tool
     public Resource $resource;
 
     /**
+     * The formatter for hierarchy item display titles.
+     *
+     * @var callable|null
+     */
+    public mixed $formatItemTitle = null;
+
+    /**
+     * The custom hierarchy item key to column name mappings.
+     *
+     * @var array{
+     *  idKey: string|null,
+     *  parentKey: string|null,
+     *  orderKey: string|null
+     * }
+     */
+    protected array $customKeyMappings = [
+        'idKey' => null,
+        'parentKey' => null,
+        'orderKey' => null,
+    ];
+
+    /**
      * Hide the tool navigation menu entry.
      */
     protected bool $hideMenu = false;
@@ -120,13 +142,14 @@ class ResourceHierarchy extends Tool
     /**
      * Get the available tool configuration.
      */
-    public function getConfig()
+    public function getConfig(): array
     {
-        return [
+        $keyNames = $this->getKeyNames();
+
+        return array_merge($keyNames, [
             'pageTitle' => $this->getPageTitle(),
             'pageDescription' => $this->pageDescription,
             'resourceUriKey' => $this->resource->uriKey(),
-            'modelKey' => $this->resource->model()->getKeyName(),
             'maxDepth' => $this->maxDepth,
             'enableRtl' => Nova::rtlEnabled(),
             'enableReordering' => $this->enableReordering,
@@ -134,7 +157,54 @@ class ResourceHierarchy extends Tool
             'enableViewAction' => in_array('view', $this->actions),
             'enableUpdateAction' => in_array('update', $this->actions),
             'enableDeleteAction' => in_array('delete', $this->actions),
+        ]);
+    }
+
+    /**
+     * Get the model key names.
+     *
+     * @return array{
+     *  idKey: string,
+     *  parentKey: string,
+     *  orderKey: string
+     * }
+     */
+    public function getKeyNames(): array
+    {
+        return [
+            'idKey' => $this->customKeyMappings['idKey'] ?? $this->resource->model()->getKeyName(),
+            'parentKey' => $this->customKeyMappings['parentKey'] ?? 'parent_id',
+            'orderKey' => $this->customKeyMappings['orderKey'] ?? null,
         ];
+    }
+
+    /**
+     * Set the function for customizing the item title within the hierarchy list.
+     *
+     * @param callable(\Illuminate\Database\Eloquent\Model $item): \Stringable|string $formatItemTitle
+     */
+    public function formatItemTitle(callable $formatItemTitle): self
+    {
+        $this->formatItemTitle = $formatItemTitle;
+
+        return $this;
+    }
+
+    /**
+     * Set the key names for the resource.
+     */
+    public function keyNames(
+        string $idKey = 'id',
+        string $parentKey = 'parent_id',
+        ?string $orderKey = null
+    ): self {
+        $this->customKeyMappings = [
+            'idKey' => $idKey,
+            'parentKey' => $parentKey,
+            'orderKey' => $orderKey,
+        ];
+
+        return $this;
     }
 
     /**
@@ -203,6 +273,11 @@ class ResourceHierarchy extends Tool
     public function enableReordering(bool $enableReordering = true): self
     {
         $this->enableReordering = $enableReordering;
+
+        // default to using 'rank' as the order key if custom mappings haven't been set
+        if (! isset($this->customKeyMappings['orderKey'])) {
+            $this->customKeyMappings['orderKey'] = 'rank';
+        }
 
         return $this;
     }

@@ -21,7 +21,7 @@
     <Card class="nrh-hierarchy-list-card">
       <HierarchyList
         :resourceUriKey="resourceUriKey"
-        :modelKey="modelKey"
+        :idKey="idKey"
         :maxDepth="maxDepth"
         :createUrl="createUrl"
         :enableReordering="enableReordering"
@@ -42,7 +42,7 @@ export default {
       type: String,
       required: true
     },
-    modelKey: {
+    idKey: {
       type: String,
       required: true
     },

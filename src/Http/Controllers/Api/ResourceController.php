@@ -20,18 +20,41 @@ class ResourceController extends Controller
     public function index(HierarchyRequest $request): JsonResponse
     {
         $tool = $request->tool();
-        $orderField = 'rank';
+        $keyNames = $tool->getKeyNames();
+
         $results = $request->newQuery()
-            ->with($tool->resource::$with)
-            ->orderBy($orderField)
+            ->with($tool->resource::$with ?? [])
             ->get();
 
         $total = count($results);
         $hierarchy = $this->buildHierarchy(
             $results,
-            fn(Model $item) => $item->toArray(),
-            'id',
-            'parent_id'
+            function(Model $item) use ($tool, $keyNames) {
+                $resource = new $tool->resource($item);
+
+                $title = isset($tool->formatItemTitle) && is_callable($tool->formatItemTitle) ?
+                    call_user_func($tool->formatItemTitle, $item) :
+                    $resource->title();
+
+                // sort using the order key value if configured, otherwise use the title value
+                $sortValue = isset($keyNames['orderKey']) && $keyNames['orderKey'] ?
+                    $item->{$keyNames['orderKey']} :
+                    $title;
+
+                return [
+                    $keyNames['idKey'] => $item->{$keyNames['idKey']},
+                    'title' => $title,
+                    'sortValue' => $sortValue,
+                ];
+            },
+            function(array $children) {
+                // sort by the sort value
+                usort($children, fn($a, $b) => $a['sortValue'] <=> $b['sortValue']);
+
+                return array_values($children);
+            },
+            $keyNames['idKey'],
+            $keyNames['parentKey']
         );
 
         return new JsonResponse([
@@ -48,36 +71,34 @@ class ResourceController extends Controller
         $hierarchy = $request->validated('hierarchy');
 
         // parse hierarchy to a flat array
-        $idField = 'id';
-        $parentIdField = 'parent_id';
-        $orderField = 'rank';
+        $keyNames = $request->tool()->getKeyNames();
+        $idKey = $keyNames['idKey'];
+        $parentKey = $keyNames['parentKey'];
+        $orderKey = $keyNames['orderKey'];
         $parsed = $this->parseHierarchy(
             $hierarchy,
-            function($item, $parentId, $rank) use ($idField, $parentIdField, $orderField) {
-                $formatted = [
-                    $idField => $item[$idField],
-                    $parentIdField => $parentId,
-                ];
-                if ($orderField) $formatted[$orderField] = $rank;
-
-                return $formatted;
-            }
+            fn($item, $parentId, $rank) => [
+                $idKey => $item[$idKey] ?? null,
+                $parentKey => $parentId,
+                $orderKey => $rank,
+            ],
+            $idKey
         );
 
         // get models in the hierarchy
         $models = $request->newQuery()
-            ->whereIn($idField, Arr::pluck($parsed, $idField))
+            ->whereIn($idKey, Arr::pluck($parsed, $idKey))
             ->get();
 
         // update all parents and orders, ensuring we trigger model events
         foreach ($parsed as $item) {
-            if (! isset($item[$idField])) continue;
+            if (! isset($item[$idKey])) continue;
 
-            $model = $models->firstWhere($idField, '=', $item[$idField]);
+            $model = $models->firstWhere($idKey, '=', $item[$idKey]);
             if (! $model) continue;
 
-            $model->$parentIdField = $item[$parentIdField];
-            if ($orderField) $model->$orderField = $item[$orderField];
+            $model->$parentKey = $item[$parentKey];
+            $model->$orderKey = $item[$orderKey];
 
             $model->save();
         }
