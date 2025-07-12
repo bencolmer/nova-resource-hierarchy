@@ -5,11 +5,11 @@
     "novaResourceHierarchy.deletedResource": "The resource was deleted!",
     "novaResourceHierarchy.edit": "Edit",
     "novaResourceHierarchy.failedToDelete": "Failed to delete the resource",
-    "novaResourceHierarchy.failedToFetchHierarchy": "Failed to fetch the hierarchy",
-    "novaResourceHierarchy.failedToSaveHierarchy": "Failed to save the hierarchy",
+    "novaResourceHierarchy.failedToFetchHierarchy": "Failed to fetch resources",
+    "novaResourceHierarchy.failedToSaveHierarchy": "Failed to save resources",
     "novaResourceHierarchy.move": "Move",
     "novaResourceHierarchy.noResourcesFound": "No resources found",
     "novaResourceHierarchy.noResourcesToDisplay": "We couldn't find any resources to display.",
-    "novaResourceHierarchy.updatedHierarchy": "The hierarchy was updated!",
+    "novaResourceHierarchy.updatedHierarchy": "The resources were reordered!",
     "novaResourceHierarchy.view": "View"
 }
