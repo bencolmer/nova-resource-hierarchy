@@ -14,7 +14,7 @@
         :href="createUrl"
         class="nrh-btn-primary"
       >
-        Create
+        {{ __('novaResourceHierarchy.create') }}
       </Link>
     </div>
 

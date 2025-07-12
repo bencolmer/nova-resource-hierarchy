@@ -1,8 +1,8 @@
 <template>
   <VueNestableHandle
     v-if="authorizedToReorderHierarchy && enableReordering"
-    title="Move"
-    aria-label="Move"
+    :title="__('novaResourceHierarchy.move')"
+    :aria-label="__('novaResourceHierarchy.move')"
     :class="isDisabled ? 'nrh-disabled' : ''"
   >
     <Icon name="arrows-pointing-out" type="solid" class="nrh-icon" />
@@ -17,8 +17,8 @@
     >
       <Link
         v-if="enableViewAction"
-        title="View"
-        aria-label="View"
+        :title="__('novaResourceHierarchy.view')"
+        :aria-label="__('novaResourceHierarchy.view')"
         :href="viewUrl"
         :class="`nrh-detail-action ${!item?.authorizedToView ? 'nrh-unauthorized' : ''}`"
         :tabIndex="!item?.authorizedToView || isDisabled ? '-1' : ''"
@@ -28,8 +28,8 @@
 
       <Link
         v-if="enableUpdateAction"
-        title="Edit"
-        aria-label="Edit"
+        :title="__('novaResourceHierarchy.edit')"
+        :aria-label="__('novaResourceHierarchy.edit')"
         :href="updateUrl"
         :class="`nrh-detail-action ${!item?.authorizedToUpdate ? 'nrh-unauthorized' : ''}`"
         :tabIndex="!item?.authorizedToUpdate || isDisabled ? '-1' : ''"
@@ -39,8 +39,8 @@
 
       <button
         v-if="enableDeleteAction"
-        title="Delete"
-        aria-label="Delete"
+        :title="__('novaResourceHierarchy.delete')"
+        :aria-label="__('novaResourceHierarchy.delete')"
         type="button"
         @click.prevent="$emit('confirmDelete', item)"
         :class="`nrh-detail-action ${!item?.authorizedToDelete ? 'nrh-unauthorized' : ''}`"

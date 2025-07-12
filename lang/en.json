@@ -1,0 +1,15 @@
+{
+    "novaResourceHierarchy.confirmDelete": "Are you sure you want to delete this resource?",
+    "novaResourceHierarchy.create": "Create",
+    "novaResourceHierarchy.delete": "Delete",
+    "novaResourceHierarchy.deletedResource": "The resource was deleted!",
+    "novaResourceHierarchy.edit": "Edit",
+    "novaResourceHierarchy.failedToDelete": "Failed to delete the resource",
+    "novaResourceHierarchy.failedToFetchHierarchy": "Failed to fetch the hierarchy",
+    "novaResourceHierarchy.failedToSaveHierarchy": "Failed to save the hierarchy",
+    "novaResourceHierarchy.move": "Move",
+    "novaResourceHierarchy.noResourcesFound": "No resources found",
+    "novaResourceHierarchy.noResourcesToDisplay": "We couldn't find any resources to display.",
+    "novaResourceHierarchy.updatedHierarchy": "The hierarchy was updated!",
+    "novaResourceHierarchy.view": "View"
+}

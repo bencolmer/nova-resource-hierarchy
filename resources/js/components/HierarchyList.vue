@@ -6,17 +6,17 @@
       class="nrh-no-results"
     >
       <Heading :level="2">
-        No resources found
+        {{ __('novaResourceHierarchy.noResourcesFound') }}
       </Heading>
 
-      <p>We couldn't find any resources to display.</p>
+      <p>{{ __('novaResourceHierarchy.noResourcesToDisplay') }}</p>
 
       <Link
         v-if="authorizedToCreate && enableCreateAction && createUrl"
         :href="createUrl"
         class="nrh-btn-primary"
       >
-        Create
+        {{ __('novaResourceHierarchy.create') }}
       </Link>
     </div>
 
@@ -189,12 +189,12 @@ export default {
           this.isSaving = false;
 
           if (! data?.success) {
-            Nova.error(this.__('Failed to save hierarchy'));
+            Nova.error(this.__('novaResourceHierarchy.failedToSaveHierarchy'));
             this.getResources();
             return;
           }
 
-          Nova.success(this.__('Successfully updated hierarchy'));
+          Nova.success(this.__('novaResourceHierarchy.updatedHierarchy'));
         })
         .catch((e) => {
           if (isCancel(e)) return;
@@ -202,7 +202,7 @@ export default {
           this.isSaving = false;
 
           // display error and refresh hierarchy
-          Nova.error(this.__('Failed to save hierarchy'));
+          Nova.error(this.__('novaResourceHierarchy.failedToSaveHierarchy'));
           this.getResources();
 
           throw e;
@@ -234,7 +234,7 @@ export default {
             if (isCancel(e)) return;
 
             this.isLoading = false;
-            Nova.error(this.__('Failed to fetch hierarchy'));
+            Nova.error(this.__('novaResourceHierarchy.failedToFetchHierarchy'));
             throw e;
           });
       });
@@ -244,7 +244,7 @@ export default {
     * Confirm a delete action.
     */
     confirmDelete(item) {
-      if (confirm('Are you sure you want to delete this resource?')) {
+      if (confirm(this.__('novaResourceHierarchy.confirmDelete'))) {
         this.deleteResource(item);
       }
     },
@@ -271,7 +271,7 @@ export default {
 
           // refetch resources after delete
           this.getResources();
-          Nova.success('Successfully deleted the item');
+          Nova.success(this.__('novaResourceHierarchy.deletedResource'));
         })
         .catch((e) => {
           if (isCancel(e)) return;
@@ -279,7 +279,7 @@ export default {
           this.isSaving = false;
 
           this.getResources();
-          Nova.error(this.__('Failed to delete the item'));
+          Nova.error(this.__('novaResourceHierarchy.failedToDelete'));
           throw e;
         });
     },
