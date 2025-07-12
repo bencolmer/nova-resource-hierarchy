@@ -20,13 +20,15 @@ class ToolServiceProvider extends ServiceProvider
             $this->routes();
         });
 
-        $this->publishes([
-            __DIR__.'/../lang/' => base_path('lang/vendor/nova-resource-hierarchy/'),
-        ]);
-
         Nova::serving(function (ServingNova $event) {
             $this->translations();
         });
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../lang/' => base_path('lang/vendor/nova-resource-hierarchy/'),
+            ], 'translations');
+        }
     }
 
     /**
