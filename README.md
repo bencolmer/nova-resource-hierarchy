@@ -7,7 +7,7 @@ This package allows you to display and manage resource hierarchy in a tree view 
 
 ![Resource Hierarchy](docs/index.jpg)
 
-## Features:
+## Features
 
 - Drag-and-drop nesting and reordering
 - A large number of [configuration options](#configuration)
@@ -102,6 +102,8 @@ public function tools()
 
 Set the maximum hierarchy depth.
 
+By default, the maximum depth is 10.
+
 ```diff
 public function tools()
 {
@@ -116,7 +118,7 @@ public function tools()
 
 You can control which actions (Create, View, Update, and Delete) are available.
 
-By default, the View, Edit, and Delete actions are available. These actions are protected by authorization controls.
+By default, the Create, View, Update, and Delete actions are available. These actions are protected by [authorization policies](https://nova.laravel.com/docs/v5/resources/authorization#policies).
 
 ```diff
 public function tools()
@@ -158,7 +160,7 @@ public function tools()
 
 ### Page Title/Description
 
-You can customize the title of the page and set a description (optional).
+You can customize the title of the page and set a description.
 
 
 ```diff
@@ -176,7 +178,7 @@ public function tools()
 
 You can customize the title of each item displayed in the hierarchy.
 
-By default, the ["title" of the resource](https://nova.laravel.com/docs/v5/search/global-search#title-%2F-subtitle-attributes) will be displayed.
+By default, the [resource title](https://nova.laravel.com/docs/v5/search/global-search#title-%2F-subtitle-attributes) will be displayed.
 
 
 ```diff
@@ -195,7 +197,7 @@ public function tools()
 
 ## Authorization
 
-This package uses Laravel's [authorization policies](https://nova.laravel.com/docs/v5/resources/authorization#policies) to control Create / View / Update / Delete permissions.
+This package uses Laravel's [authorization policies](https://nova.laravel.com/docs/v5/resources/authorization#policies) to check a user's Create / View / Update / Delete permissions.
 
 You can also define one further authorization method to control whether a user is authorized to reorder the resource hierarchy:
 
