@@ -1,6 +1,6 @@
 <template>
   <VueNestableHandle
-    v-if="enableReordering"
+    v-if="authorizedToReorderHierarchy && enableReordering"
     title="Move"
     aria-label="Move"
     :class="isDisabled ? 'nrh-disabled' : ''"
@@ -20,8 +20,8 @@
         title="View"
         aria-label="View"
         :href="viewUrl"
-        class="nrh-detail-action"
-        :tabIndex="isDisabled ? '-1' : ''"
+        :class="`nrh-detail-action ${!item?.authorizedToView ? 'nrh-unauthorized' : ''}`"
+        :tabIndex="!item?.authorizedToView || isDisabled ? '-1' : ''"
       >
         <Icon name="eye" type="outline" class="nrh-icon" />
       </Link>
@@ -31,8 +31,8 @@
         title="Edit"
         aria-label="Edit"
         :href="updateUrl"
-        class="nrh-detail-action"
-        :tabIndex="isDisabled ? '-1' : ''"
+        :class="`nrh-detail-action ${!item?.authorizedToUpdate ? 'nrh-unauthorized' : ''}`"
+        :tabIndex="!item?.authorizedToUpdate || isDisabled ? '-1' : ''"
       >
         <Icon name="pencil-alt" type="outline" class="nrh-icon" />
       </Link>
@@ -43,8 +43,9 @@
         aria-label="Delete"
         type="button"
         @click.prevent="$emit('confirmDelete', item)"
-        class="nrh-detail-action"
-        :tabIndex="isDisabled ? '-1' : ''"
+        :class="`nrh-detail-action ${!item?.authorizedToDelete ? 'nrh-unauthorized' : ''}`"
+        :tabIndex="!item?.authorizedToDelete || isDisabled ? '-1' : ''"
+        :disabled="!item?.authorizedToDelete || isDisabled"
       >
         <Icon name="trash" type="outline" class="nrh-icon" />
       </button>
@@ -69,6 +70,11 @@ export default {
     item: {
       type: Object,
       required: true,
+    },
+    authorizedToReorderHierarchy: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     isDisabled: {
       type: Boolean,

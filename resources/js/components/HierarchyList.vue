@@ -12,7 +12,7 @@
       <p>We couldn't find any resources to display.</p>
 
       <Link
-        v-if="enableCreateAction && createUrl"
+        v-if="authorizedToCreate && enableCreateAction && createUrl"
         :href="createUrl"
         class="nrh-btn-primary"
       >
@@ -42,6 +42,7 @@
           :enableViewAction="enableViewAction"
           :enableUpdateAction="enableUpdateAction"
           :enableDeleteAction="enableDeleteAction"
+          :authorizedToReorderHierarchy="authorizedToReorderHierarchy"
           @confirmDelete="confirmDelete"
         />
       </template>
@@ -70,6 +71,16 @@ export default {
     createUrl: {
       type: String,
       required: false
+    },
+    authorizedToCreate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    authorizedToReorderHierarchy: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     enableReordering: {
       type: Boolean,
@@ -152,7 +163,7 @@ export default {
       // disable ordering while saving changes or loading
       if (this.isLoading || this.isSaving) return false;
 
-      return this.enableReordering;
+      return this.authorizedToReorderHierarchy && this.enableReordering;
     },
 
     /**
@@ -434,6 +445,11 @@ export default {
           padding: 0.125rem;
           border-radius: 0.25rem;
           color: rgba(var(--colors-gray-500));
+
+          &.nrh-unauthorized {
+            pointer-events: none;
+            opacity: 0.5;
+          }
 
           &:is(.dark *) {
             color: rgba(var(--colors-gray-400));

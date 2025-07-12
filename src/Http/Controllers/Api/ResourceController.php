@@ -2,7 +2,7 @@
 
 namespace BenColmer\NovaResourceHierarchy\Http\Controllers\Api;
 
-use BenColmer\NovaResourceHierarchy\Http\Requests\HierarchyRequest;
+use BenColmer\NovaResourceHierarchy\Http\Requests\IndexHierarchyRequest;
 use BenColmer\NovaResourceHierarchy\Http\Requests\UpdateHierarchyRequest;
 use BenColmer\NovaResourceHierarchy\Traits\HandlesHierarchy;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ class ResourceController extends Controller
     /**
      * Get the resource hierarchy.
      */
-    public function index(HierarchyRequest $request): JsonResponse
+    public function index(IndexHierarchyRequest $request): JsonResponse
     {
         $tool = $request->tool();
         $keyNames = $tool->getKeyNames();
@@ -26,11 +26,12 @@ class ResourceController extends Controller
             ->with($tool->resource::$with ?? [])
             ->get();
 
-        $total = count($results);
+        $total = 0;
         $hierarchy = $this->buildHierarchy(
             $results,
-            function(Model $item) use ($tool, $keyNames) {
+            function(Model $item) use ($tool, $keyNames, $request, &$total) {
                 $resource = new $tool->resource($item);
+                $total++;
 
                 $title = isset($tool->formatItemTitle) && is_callable($tool->formatItemTitle) ?
                     call_user_func($tool->formatItemTitle, $item) :
@@ -45,6 +46,9 @@ class ResourceController extends Controller
                     $keyNames['idKey'] => $item->{$keyNames['idKey']},
                     'title' => $title,
                     'sortValue' => $sortValue,
+                    'authorizedToView' => $resource->authorizedToView($request),
+                    'authorizedToUpdate' => $resource->authorizedToUpdate($request),
+                    'authorizedToDelete' => $resource->authorizedToDelete($request),
                 ];
             },
             function(array $children) {

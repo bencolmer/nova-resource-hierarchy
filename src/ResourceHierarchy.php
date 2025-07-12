@@ -95,6 +95,9 @@ class ResourceHierarchy extends Tool
         }
 
         $this->resource = $resourceClass::newResource();
+
+        // hide tool if not authorized to view the resource
+        $this->canSee(fn($request) => $this->resource::authorizedToViewAny($request));
     }
 
     /**
@@ -295,5 +298,16 @@ class ResourceHierarchy extends Tool
         );
 
         return $this;
+    }
+
+    /**
+     * Check if a user is authorized to reorder the hierarchy.
+     */
+    public function authorizedToReorderHierarchy(Request $request): bool
+    {
+        return method_exists($this->resource, 'authorizedToReorderHierarchy') &&
+            is_callable([$this->resource, 'authorizedToReorderHierarchy']) ?
+                $this->resource->authorizedToReorderHierarchy($request) :
+                true;
     }
 }

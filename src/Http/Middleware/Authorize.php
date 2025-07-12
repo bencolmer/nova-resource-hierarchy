@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
 use BenColmer\NovaResourceHierarchy\ResourceHierarchy;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use Symfony\Component\HttpFoundation\Response;
 
 class Authorize
@@ -36,6 +37,11 @@ class Authorize
      */
     public function matchesTool(Tool $tool): bool
     {
-        return $tool instanceof ResourceHierarchy;
+        if (! $tool instanceof ResourceHierarchy) return false;
+
+        // handle multiple tool instances
+        $request = app(NovaRequest::class);
+        $requestResource = $request->resource();
+        return $tool->resource::class === $requestResource;
     }
 }

@@ -4,13 +4,13 @@
 
     <Heading>{{ pageTitle }}</Heading>
 
-    <div class="nrh-hierarchy-header" v-if="pageDescription || enableCreateAction">
+    <div class="nrh-hierarchy-header" v-if="pageDescription || (authorizedToCreate && enableCreateAction)">
       <p class="nrh-intro-copy" v-if="pageDescription">
         {{ pageDescription }}
       </p>
 
       <Link
-        v-if="enableCreateAction"
+        v-if="authorizedToCreate && enableCreateAction"
         :href="createUrl"
         class="nrh-btn-primary"
       >
@@ -30,6 +30,8 @@
         :enableViewAction="enableViewAction"
         :enableUpdateAction="enableUpdateAction"
         :enableDeleteAction="enableDeleteAction"
+        :authorizedToCreate="authorizedToCreate"
+        :authorizedToReorderHierarchy="authorizedToReorderHierarchy"
       />
     </Card>
   </div>
@@ -57,6 +59,16 @@ export default {
     pageDescription: {
       type: String,
       required: false
+    },
+    authorizedToCreate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    authorizedToReorderHierarchy: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     enableReordering: {
       type: Boolean,
