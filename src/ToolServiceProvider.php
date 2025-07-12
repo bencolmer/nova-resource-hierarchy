@@ -21,7 +21,7 @@ class ToolServiceProvider extends ServiceProvider
         });
 
         $this->publishes([
-            __DIR__.'/../lang/' => resource_path('lang/vendor/nova-resource-hierarchy/'),
+            __DIR__.'/../lang/' => base_path('lang/vendor/nova-resource-hierarchy/'),
         ]);
 
         Nova::serving(function (ServingNova $event) {
@@ -74,7 +74,7 @@ class ToolServiceProvider extends ServiceProvider
         // load the default translation file first, then any published translations for the locale
         $basePaths = [
             __DIR__.'/../lang/',
-            resource_path('lang/vendor/nova-resource-hierarchy/'),
+            base_path('lang/vendor/nova-resource-hierarchy/'),
         ];
 
         $hasLoadedTranslations = false;
