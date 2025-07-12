@@ -409,6 +409,14 @@ export default {
     justify-content: start;
     align-items: center;
 
+    &:is(.dark *):hover .nrh-details {
+      background-color: rgba(var(--colors-gray-900));
+    }
+
+    &:hover .nrh-details {
+      background-color: rgba(var(--colors-gray-50));
+    }
+
     .nrh-details {
       display: flex;
       justify-content: space-between;
